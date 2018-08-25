@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+<head>
   <meta charset="utf-8">
   <title>ToDo</title>
   <style>
@@ -51,14 +52,6 @@ function l(id) {
 	return document.getElementById(id);
 }
 
-function store(a, b) {
-	if(b === null) {
-		return window.localStorage.getItem(a);
-	} else {
-		return window.localStorage.setItem(a, b);
-	}
-}
-
 function make(tag) {
 	return document.createElement(tag);
 }
@@ -74,10 +67,9 @@ function newItem(text, date) {
 var current = {};
 var list = [];
 
-if(store("tasks") !== "") {
-	list = store("tasks");
-	current = list[0];
-}
+var storage = window.localStorage;
+var load = storage.getItem("tasks");
+if(load !== null) list = JSON.parse(load);
 
 var monthNames = {
 	jan: 0,
@@ -262,7 +254,7 @@ document.addEventListener("keydown", function(e) {
 			break;
 	}
 	sortDates();
-	store("tasks", list);
+	storage.setItem("tasks", JSON.stringify(list));
 	renderPage();
 }, false);
 
