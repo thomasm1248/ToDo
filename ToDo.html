@@ -52,7 +52,7 @@ function l(id) {
 }
 
 function store(a, b) {
-	if(b === undefined) {
+	if(b === null) {
 		return window.localStorage.getItem(a);
 	} else {
 		return window.localStorage.setItem(a, b);
