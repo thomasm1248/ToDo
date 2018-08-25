@@ -66,10 +66,34 @@ function newItem(text, date) {
 
 var current = {};
 var list = [];
-
 var storage = window.localStorage;
+
+// Load any data
 var load = storage.getItem("tasks");
-if(load !== null) list = JSON.parse(load);
+if(load !== null) {
+	var data = JSON.parse(load);
+	
+	var item;
+	for(var i in data) {
+		item = newItem(data[i].t, new Date(data[i].d));
+		item.state = data[i].s;
+		list.push(item);
+	}
+}
+
+function storeData() {
+	var data = [];
+	var item;
+	for(var i in list) {
+		item = {
+			d: list[i].date.toString(),
+			s: list[i].state,
+			t: list[i].text
+		};
+		data.push(item);
+	}
+	storage.setItem("tasks", JSON.stringify(data));
+}
 
 var monthNames = {
 	jan: 0,
@@ -255,7 +279,7 @@ document.addEventListener("keydown", function(e) {
 			break;
 	}
 	sortDates();
-	storage.setItem("tasks", JSON.stringify(list));
+	storeData();
 	renderPage();
 }, false);
 
