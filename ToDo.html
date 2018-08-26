@@ -201,9 +201,19 @@ function getDate() {
 }
 
 function sortDates() {
-	list.sort(function(a, b) {
-		return a.date > b.date;
-	});
+	var changed;
+	do {
+		changed = false;
+		for(var i = 0; i < list.length - 1; i++) {
+			if(list[i].date > list[i+1].date) {
+				var temp = list[i];
+				list[i] = list[i+1];
+				list[i+1] = temp;
+				changed = true;
+				break;
+			}
+		}
+	} while(changed);
 }
 
 function createTask() {
