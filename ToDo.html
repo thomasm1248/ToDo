@@ -71,6 +71,14 @@ function newItem(text, date) {
 	};
 }
 
+var NoDate = function(){};
+NoDate.prototype.toDateString = function() {
+	return "No Due Date";
+};
+NoDate.prototype.toString = function() {
+	return "No Due Date";
+};
+
 var current = {};
 var list = [];
 var tagColors = {};
@@ -82,8 +90,10 @@ if(load !== null) {
 	var data = JSON.parse(load);
 	
 	var item;
+	var date;
 	for(var i in data) {
-		item = newItem(data[i].t, new Date(data[i].d));
+		date = data[i].d;
+		item = newItem(data[i].t, date === "No Due Date" ? new NoDate() : new Date(date));
 		item.state = data[i].s;
 		if(data[i].ta) {
 			item.tags = data[i].ta;
@@ -124,11 +134,6 @@ var monthNames = {
 	oct: 9,
 	nov: 10,
 	dec: 11
-};
-
-var NoDate = function(){};
-NoDate.prototype.toDateString = function() {
-	return "No Due Date";
 };
 
 function renderPage() {
@@ -232,12 +237,29 @@ function getDate() {
 	return date;
 }
 
+function compareDates(a, b) {
+	// Return true if in wrong order
+	
+	var as = a.toDateString();
+	var bs = b.toDateString();
+	var blank = "No Due Date";
+	if(as === blank && bs !== blank) {
+		return true;
+	}
+	
+	if(a > b) {
+		return true;
+	}
+	
+	return false;
+}
+
 function sortDates() {
 	var changed;
 	do {
 		changed = false;
 		for(var i = 0; i < list.length - 1; i++) {
-			if(list[i].date.toDateString() === "No Due Date" && list[i+1].date.toDateString !== "No Due Date" || list[i].date > list[i+1].date) {
+			if(compareDates(list[i].date, list[i+1].date)) {
 				var temp = list[i];
 				list[i] = list[i+1];
 				list[i+1] = temp;
@@ -318,12 +340,7 @@ document.addEventListener("keydown", function(e) {
 		case 84:
 			var tag = prompt("Tag");
 			if(tag !== "") {
-				var index = current.tags.indexOf(tag);
-				if(index >= 0) {
-					current.tags.splice(index, 1);
-				} else {
-					current.tags.push(tag);
-				}
+				current.tags.push(tag);
 			}
 			break;
 		case 67:
