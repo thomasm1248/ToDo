@@ -237,7 +237,7 @@ function sortDates() {
 	do {
 		changed = false;
 		for(var i = 0; i < list.length - 1; i++) {
-			if(list[i].date > list[i+1].date) {
+			if(list[i].date.toDateString() === "No Due Date" && list[i+1].date.toDateString !== "No Due Date" || list[i].date > list[i+1].date) {
 				var temp = list[i];
 				list[i] = list[i+1];
 				list[i+1] = temp;
