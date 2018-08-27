@@ -33,6 +33,12 @@ div div {
 	padding-bottom: 2px;
 }
 
+.tag {
+	background-color: lightgrey;
+	margin-left: 5px;
+	padding: 2px 5px;
+}
+
 .todo {
 	border-left: 20px solid lightgray;
 }
@@ -60,12 +66,14 @@ function newItem(text, date) {
 	return {
 		date: date,
 		state: "todo",
+		tags: [],
 		text: text
 	};
 }
 
 var current = {};
 var list = [];
+var tagColors = {};
 var storage = window.localStorage;
 
 // Load any data
@@ -77,8 +85,14 @@ if(load !== null) {
 	for(var i in data) {
 		item = newItem(data[i].t, new Date(data[i].d));
 		item.state = data[i].s;
+		if(data[i].ta) {
+			item.tags = data[i].ta;
+		}
 		list.push(item);
 	}
+	
+	// Load tag colors
+	tagColors = JSON.parse(storage.getItem("tagColors"));
 }
 
 function storeData() {
@@ -88,11 +102,13 @@ function storeData() {
 		item = {
 			d: list[i].date.toString(),
 			s: list[i].state,
+			ta: list[i].tags,
 			t: list[i].text
 		};
 		data.push(item);
 	}
 	storage.setItem("tasks", JSON.stringify(data));
+	storage.setItem("tagColors", JSON.stringify(tagColors));
 }
 
 var monthNames = {
@@ -130,6 +146,7 @@ function renderPage() {
 			header.innerHTML = dateH;
 			newList.appendChild(header);
 		}
+		
 		// Make a new item
 		var item = make("div");
 		item.className = "item";
@@ -137,6 +154,21 @@ function renderPage() {
 		item.className = list[i].state;
 		if(list[i] === current) { // Highlight if focused
 			item.id = "focus";
+		}
+		
+		// Add tags
+		var tag;
+		var tagName;
+		for(var j in list[i].tags) {
+			tagName = list[i].tags[j];
+			tag = make("span");
+			tag.className = "tag";
+			tag.innerHTML = tagName;
+			if(tagColors[tagName] !== "") {
+				tag.style.backgroundColor = tagColors[tagName];
+			}
+				
+			item.appendChild(tag);
 		}
 		
 		// Add the item
@@ -282,6 +314,17 @@ document.addEventListener("keydown", function(e) {
 			if(date !== "cancel") {
 				current.date = date;
 			}
+			break;
+		case 84:
+			var tag = prompt("Tag");
+			if(tag !== "") {
+				current.tags.push(tag);
+			}
+			break;
+		case 67:
+			var tagName = prompt("Tag");
+			var color = prompt("Color");
+			tagColors[tagName] = color;
 			break;
 	}
 	sortDates();
