@@ -340,7 +340,12 @@ document.addEventListener("keydown", function(e) {
 		case 84:
 			var tag = prompt("Tag");
 			if(tag !== "") {
-				current.tags.push(tag);
+				var index = current.tags.indexOf(tag);
+				if(index >= 0) {
+					current.tags.splice(index, 1);
+				} else {
+					current.tags.push(tag);
+				}
 			}
 			break;
 		case 67:
